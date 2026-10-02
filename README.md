@@ -332,7 +332,43 @@ The output will be produced in the same folder with .elf appended on to the end 
 
 Dependencies: zlib
 
-	make
+From the repository root:
+
+```sh
+cd vita-unmake-fself/src
+make clean && make
+```
+
+The executable is generated as `vita-unmake-fself` in `src`.
+
+#### macOS
+
+Install the Xcode Command Line Tools (`xcode-select --install`) if needed.
+They provide the compiler, `make`, and the macOS SDK with zlib; VitaSDK is
+not required. Build using the commands above. The Makefile detects macOS
+with `uname -s` and uses dynamic linking. Linux retains static linking.
+
+If you need Homebrew's zlib instead of the SDK version:
+
+```sh
+brew install zlib
+make clean
+make CPPFLAGS="-I$(brew --prefix zlib)/include" \
+     LDFLAGS="-L$(brew --prefix zlib)/lib"
+```
+
+From `vita-unmake-fself/src`, extract an unencrypted SELF and check the output:
+
+```sh
+./vita-unmake-fself /path/to/eboot.bin
+file /path/to/eboot.bin.elf
+hexdump -C -n 16 /path/to/eboot.bin.elf
+```
+
+The output should be a 32-bit ARM ELF, beginning with `7f 45 4c 46`.
+It is written next to the input with `.elf` appended; an existing output
+with that name is overwritten. Encrypted SELF files must be decrypted
+first, as described above.
 
 --------------------------------------------------------------------------------
 

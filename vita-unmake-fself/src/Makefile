@@ -4,16 +4,25 @@ OBJS = main.o
 
 LIBS = -lz 
 
-CFLAGS = -s -static -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -std=c99
+
+UNAME_S := $(shell uname -s)
+ifneq ($(UNAME_S),Darwin)
+CFLAGS += -s -static
+LDFLAGS += -static -static-libgcc
+endif
+
+.PHONY: all clean mrproper install
+
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	@echo "Creating binary $(TARGET)"
-	$(CXX) $(OBJS) -o $@ $(LIBS)  -static -static-libgcc
+	$(CXX) $(LDFLAGS) $(OBJS) -o $@ $(LIBS)
 
-%.o: %.cpp
+%.o: %.c
 	@echo "Compiling $^"
-	$(CXX) $(CFLAGS) -c $^ -o $@ -static -static-libgcc 
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
 	@echo "Removing all the .o files"
